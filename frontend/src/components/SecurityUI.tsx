@@ -1,0 +1,8 @@
+import { AlertCircle, CheckCircle2, CircleHelp, LoaderCircle, ShieldAlert } from 'lucide-react'
+import type { ReactNode } from 'react'
+export function ConsentNotice({ children }: { children: ReactNode }) { return <div className="consent"><CircleHelp size={18}/><span>{children}</span></div> }
+export function ResultCard({ title, value, detail, good }: { title: string; value: string; detail?: string; good?: boolean }) { return <article className="result-card"><div className="result-heading"><span>{title}</span>{good === true ? <CheckCircle2 className="good" size={17}/> : good === false ? <ShieldAlert className="warn" size={17}/> : null}</div><strong>{value}</strong>{detail && <p>{detail}</p>}</article> }
+export function ScoreMeter({ score, max }: { score: number; max: number }) { const percent = max ? Math.round(score / max * 100) : 0; return <div className="score-meter"><div className="score-circle"><strong>{score}</strong><span>/ {max}</span></div><div><p className="eyebrow">TRANSPARENT SCORE</p><h3>{percent}% assessed posture</h3><div className="meter"><i style={{ width: `${percent}%` }}/></div><p className="muted">Only completed checks contribute to this score.</p></div></div> }
+export function LoadingState({ text = 'Checking safely…' }: { text?: string }) { return <div className="state"><LoaderCircle className="spin"/> {text}</div> }
+export function ErrorState({ message }: { message: string }) { return <p className="notice error"><AlertCircle size={17}/>{message}</p> }
+export function SuccessState({ message }: { message: string }) { return <p className="notice success"><CheckCircle2 size={17}/>{message}</p> }

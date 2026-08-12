@@ -14,6 +14,7 @@ export async function analyzeWebsite(url: string) {
     if (!response.ok) throw new Error(payload.error || 'The website could not be analyzed.')
     return payload as { url: string; status: number; https: boolean; redirected: boolean; headers: Record<string, string | null>; secureCookieIndicator: boolean | null; note: string; browserFallback?: boolean }
   } catch (error) {
+    if (!(error instanceof TypeError)) throw error
     // GitHub Pages has no server runtime. A no-cors request provides a real
     // transport check while honestly leaving response headers unavailable.
     let parsed: URL

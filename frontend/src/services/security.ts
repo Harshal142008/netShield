@@ -7,10 +7,24 @@ export const securityState = {
 }
 
 export async function analyzeWebsite(url: string) {
-  const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/website/analyze`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
-  const payload = await response.json().catch(() => ({}))
-  if (!response.ok) throw new Error(payload.error || 'The website could not be analyzed.')
-  return payload as { url: string; status: number; https: boolean; redirected: boolean; headers: Record<string, string | null>; secureCookieIndicator: boolean | null; note: string }
+  const apiUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:4000/api'}/website/analyze`
+  try {
+    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
+    const payload = await response.json().catch(() => ({}))
+    if (!response.ok) throw new Error(payload.error || 'The website could not be analyzed.')
+    return payload as { url: string; status: number; https: boolean; redirected: boolean; headers: Record<string, string | null>; secureCookieIndicator: boolean | null; note: string; browserFallback?: boolean }
+  } catch (error) {
+    // GitHub Pages has no server runtime. A no-cors request provides a real
+    // transport check while honestly leaving response headers unavailable.
+    let parsed: URL
+    try { parsed = new URL(url) } catch { throw error }
+    if (!['http:', 'https:'].includes(parsed.protocol)) throw error
+    try {
+      await fetch(parsed.toString(), { method: 'GET', mode: 'no-cors', redirect: 'manual' })
+      const headers = { 'content-security-policy': null, 'strict-transport-security': null, 'x-frame-options': null, 'x-content-type-options': null, 'referrer-policy': null, 'permissions-policy': null }
+      return { url: parsed.toString(), status: 0, https: parsed.protocol === 'https:', redirected: false, headers, secureCookieIndicator: null, browserFallback: true, note: 'Browser-only fallback completed. The public site was reachable over transport, but response headers require the NetShield backend. No credentials or page content were read.' }
+    } catch { throw new Error('The website could not be reached. Check the URL and try again.') }
+  }
 }
 
 export async function fetchPublicIp() {

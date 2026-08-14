@@ -1,9 +1,18 @@
 export type CheckStatus = 'assessed' | 'unavailable' | 'not-assessed'
 export type StoredCheck = { status: CheckStatus; value?: string; score?: number; max?: number; updatedAt?: string; details?: string }
 const stateKey = 'netshield-security-state'
+const fallbackBlockedHosts = new Set(['localhost', 'metadata.google.internal', '169.254.169.254'])
 export const securityState = {
   read: (): Record<string, StoredCheck> => { try { return JSON.parse(localStorage.getItem(stateKey) || '{}') } catch { return {} } },
   write: (key: string, value: StoredCheck) => { const next = securityState.read(); next[key] = value; localStorage.setItem(stateKey, JSON.stringify(next)); window.dispatchEvent(new Event('netshield-state')) },
+}
+
+function validateBrowserFallbackTarget(url: URL) {
+  const hostname = url.hostname.toLowerCase().replace(/^\[|\]$/g, '')
+  const privateIpv4 = /^(0|10|127)\.|^169\.254\.|^172\.(1[6-9]|2\d|3[0-1])\.|^192\.168\./.test(hostname)
+  if (url.username || url.password || (url.port && !['80', '443'].includes(url.port)) || fallbackBlockedHosts.has(hostname) || hostname.endsWith('.localhost') || hostname.endsWith('.local') || privateIpv4 || hostname === '::1' || hostname === '::') {
+    throw new Error('Private and internal targets are not allowed.')
+  }
 }
 
 export async function analyzeWebsite(url: string) {
@@ -20,6 +29,7 @@ export async function analyzeWebsite(url: string) {
     let parsed: URL
     try { parsed = new URL(url) } catch { throw error }
     if (!['http:', 'https:'].includes(parsed.protocol)) throw error
+    validateBrowserFallbackTarget(parsed)
     try {
       await fetch(parsed.toString(), { method: 'GET', mode: 'no-cors', redirect: 'manual' })
       const headers = { 'content-security-policy': null, 'strict-transport-security': null, 'x-frame-options': null, 'x-content-type-options': null, 'referrer-policy': null, 'permissions-policy': null }

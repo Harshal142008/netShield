@@ -2,11 +2,11 @@
 
 An educational, defensive cybersecurity project by **Harshal Santoshi**, a 3rd Year Diploma Student in Information Technology / Cybersecurity at Government Polytechnic Murtizapur.
 
-## Phase 1 and Phase 2
+## Phase 1 and Phase 2 — complete
 
 The foundation includes a responsive dark/light interface, landing page, mock local login/signup and guest mode, extensible dashboard navigation, About and ethical-use pages, reusable UI states, and a secured Express health endpoint.
 
-Phase 2 adds browser-safe Wi-Fi context, Internet security checks, a permission-based public website header analyzer, transparent scoring, and a locally persisted security checklist. Results are evidence-based: browser-limited values are marked unavailable and are never fabricated.
+Phase 2 adds browser-safe Wi-Fi context, Internet security checks, a permission-based public website header analyzer, transparent scoring, a locally persisted security checklist, and defensive security education. Results are evidence-based: browser-limited values are marked unavailable and are never fabricated.
 
 ## Stack
 
@@ -40,7 +40,7 @@ Phase 1 authentication is a development-only mock. It stores only the signed-in 
 
 ## Roadmap
 
-Phase 3 can add authenticated history, report export, and a separately hosted backend for the public deployment. GitHub Pages hosts the frontend only; the local Express API must be deployed separately and configured through `VITE_API_URL` before website analysis can work on the public site.
+Phase 3 can add authenticated history, report export, and a separately hosted backend for the public deployment. GitHub Pages hosts the frontend only; the local Express API must be deployed separately and configured through `VITE_API_URL` before full header analysis can work on the public site.
 
 NetShield must remain defensive: it must not crack passwords, jam Wi-Fi, deauthenticate devices, steal credentials, or exploit systems without authorization.
 
